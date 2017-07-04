@@ -1,0 +1,6 @@
+{
+  "pushNotification": {
+    "provider": "onesignal_OU_UN_AUTRE",
+    "appId": "app_id_ici"
+  }
+}
