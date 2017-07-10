@@ -3,7 +3,8 @@ import { Platform } from 'react-native';
 import { TabNavigator } from 'react-navigation';
 import { Icon } from 'react-native-elements';
 
-import PlaygroundScreen from '../ui/pages/playground/playground_screen';
+//import EventListScreen from '../ui/pages/playground/playground_screen';
+import EventListScreen from '../ui/pages/event_list/event_list_screen';
 import MapScreen from '../ui/pages/map/map_screen';
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -20,7 +21,7 @@ const tabBarOptions = {
 
 const MainStack = TabNavigator({
   Waiter: {
-    screen: PlaygroundScreen,
+    screen: EventListScreen,
     navigationOptions: {
       headerTintColor: "#FF0000",
       title: "Waiter",

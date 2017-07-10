@@ -62,7 +62,6 @@ class MapScreen extends Component {
   }
 
   _generateMarker(events) {
-    console.log("et coucou : ", events);
     return events.map(marker => (
       <MapView.Marker
         key={marker._id}
