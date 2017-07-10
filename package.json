@@ -24,6 +24,7 @@
     "react-native-gifted-chat": "^0.1.4",
     "react-native-i18n": "^1.0.0",
     "react-native-keyboard-aware-scroll-view": "^0.2.9",
+    "react-native-maps": "^0.15.3",
     "react-native-mixpanel": "0.0.15",
     "react-native-modal-dropdown": "^0.4.2",
     "react-native-onesignal": "^3.0.3",
