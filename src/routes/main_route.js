@@ -4,7 +4,7 @@ import { TabNavigator } from 'react-navigation';
 import { Icon } from 'react-native-elements';
 
 import PlaygroundScreen from '../ui/pages/playground/playground_screen';
-
+import MapScreen from '../ui/pages/map/map_screen';
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -28,12 +28,12 @@ const MainStack = TabNavigator({
       tabBarIcon: ({ tintColor }) => <Icon name="flight" size={iconSize} color={tintColor} />,
     }
   },
-  Waiting: {
-    screen: PlaygroundScreen,
+  MapScreen: {
+    screen: MapScreen,
     navigationOptions: {
       headerTintColor: "#0000FF",
-      title: "Waiting",
-      tabBarLabel: "Waiting",
+      title: "MapScreen",
+      tabBarLabel: "MapScreen",
       tabBarIcon: ({ tintColor }) => <Icon name="home" size={iconSize} color={tintColor} />,
     }
   }

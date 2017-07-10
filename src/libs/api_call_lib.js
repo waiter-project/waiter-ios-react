@@ -1,5 +1,6 @@
 const config = require('../config');
 const StorageLib = require('./storage_lib').default;
+const querystring = require('querystring');
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -48,9 +49,8 @@ function _getHeaders(data, multipart) {
 
   let headers = {};
 
-  if (!multipart) {
-    headers['Content-Type'] = 'application/json';
-  }
+  //headers['Content-Type'] = 'application/x-www-form-urlencoded';  // à faire gaff pour plus tard Pahl
+  headers['Content-Type'] = 'application/json';
 
   return headers;
 }
@@ -69,7 +69,13 @@ function _request(path, method, data) {
     uri = `${uri}:${config.api.port}`;
   }
 
-  uri = `${uri}${path}`;
+  let postData = "";
+  if (data) {
+    postData = querystring.stringify(data);
+  }
+
+  uri = `${uri}${path}?${postData}`;
+
 
   let options = {
     method: method,
@@ -79,6 +85,8 @@ function _request(path, method, data) {
   if (data) {
     options.body = JSON.stringify(data);
   }
+
+  console.log(options)
 
   return new Promise((resolve, reject) => {
     _getToken((err, token) => {
@@ -138,6 +146,8 @@ function _checkStatus (response) {
  * @returns {Promise.<object>}
  */
 function _performRequest (uri, options) {
+  console.log(uri);
+  console.log(options);
   return new Promise ((resolve, reject) => {
     fetch(uri, options)
       .then(_checkStatus)

@@ -1,4 +1,3 @@
-import PushNotificationLib from '../../../libs/push_notification_lib';
 import AuthenticationLib from '../../../libs/auth_lib';
 import authHelpers from '../authentication_helpers';
 
@@ -21,7 +20,6 @@ function initializeWithToken(token) {
   return function (dispatch) {
     return AuthenticationLib.storeUserTokenAsync(token)
       .then(() => {
-        registerUserDevice();
         return dispatch({ type: authHelpers.initSuccess, data: { token } });
       })
       .catch((error) => dispatch({ type: authHelpers.reset, error }));
@@ -34,12 +32,17 @@ function initializeWithToken(token) {
  * @param {Object} params
  * @returns {function}
  */
-function create (params) {
+function create(params) {
+  console.log(params);
   return function (dispatch) {
-    return AuthenticationLib.authenticateUserAsync(params)
+    return AuthenticationLib.authenticateUserAsync({
+      email: params.credentials.username,
+      password: params.credentials.password,
+      deviceId: "device_id_here"
+    }
+    )
       .then((token) => {
         dispatch({ type: authHelpers.createSuccess, data: { token } });
-        registerUserDevice();
         return dispatch(NavActions.reset('Main'));
       })
       .catch((error) => dispatch({ type: authHelpers.createFailure, error }));
@@ -51,12 +54,11 @@ function create (params) {
  * Destroy user session
  * @returns {function}
  */
-function destroy () {
+function destroy() {
   return function (dispatch) {
     return AuthenticationLib.destroySessionAsync()
       .catch(() => void 0)
       .then(() => {
-        removeUserDevice();
         dispatch({ type: authHelpers.destroySuccess });
         return dispatch(NavActions.reset('Home'));
       });
@@ -68,12 +70,11 @@ function destroy () {
  * Initialize user sessions
  * @returns {function}
  */
-function init () {
+function init() {
   return function (dispatch) {
     return AuthenticationLib.getUserTokenAsync()
       .then((token) => {
         dispatch({ type: authHelpers.initSuccess, data: { token } });
-        registerUserDevice();
         return dispatch(NavActions.reset("Main"));
       })
       .catch((error) => {
@@ -88,7 +89,7 @@ function init () {
  * Reset authentication state
  * @returns {function}
  */
-function reset () {
+function reset() {
   return {
     type: authHelpers.reset
   };
@@ -97,16 +98,13 @@ function reset () {
 /**
  * Register user device
  */
-function registerUserDevice () {
-  return PushNotificationLib.getPushInfosAsync()
-    .then(PushNotificationLib.registerDeviceAsync);
+function registerUserDevice() {
 }
 
 /**
  * Remove user device from storage
  */
 function removeUserDevice() {
-  return PushNotificationLib.removePushInfosAsync();
 }
 
 // ----------------------------------------------------------------------

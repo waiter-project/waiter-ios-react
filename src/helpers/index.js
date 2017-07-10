@@ -1,5 +1,7 @@
 
 import ActionHelper from './action_helper';
+import ColorHelper from './color_helper';
+import { Alert } from 'react-native';
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -61,12 +63,30 @@ function queryStringToObject (urlQueryString) {
   return result;
 }
 
+
+/**
+ *
+ * Display alert messages
+ * @param {String} title
+ * @param {String} message
+ * @param {Array} buttons
+ */
+function alert (title, message, buttons) {
+  Alert.alert(
+    title,
+    message,
+    buttons
+  );
+}
+
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
 export {
+  alert,
   ActionHelper,
   objectToUrl,
-  queryStringToObject
+  queryStringToObject,
+  ColorHelper
 };

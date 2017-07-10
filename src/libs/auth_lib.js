@@ -12,8 +12,8 @@ import StorageLib from './storage_lib';
  */
 function authenticateUserAsync (params) {
   let token;
-  return ApiCallLib.post('/login', { authentication: params })
-    .then((data) => token = data.token)
+  return ApiCallLib.post('/user/login', params)
+    .then((data) => token = data.data.token)
     .then(storeUserTokenAsync)
     .then(() => token);
 }
