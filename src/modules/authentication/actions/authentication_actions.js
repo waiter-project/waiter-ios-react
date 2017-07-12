@@ -33,7 +33,6 @@ function initializeWithToken(token) {
  * @returns {function}
  */
 function create(params) {
-  console.log(params);
   return function (dispatch) {
     return AuthenticationLib.authenticateUserAsync({
       email: params.credentials.username,
@@ -41,8 +40,8 @@ function create(params) {
       deviceId: "device_id_here"
     }
     )
-      .then((token) => {
-        dispatch({ type: authHelpers.createSuccess, data: { token } });
+      .then((data) => {
+        dispatch({ type: authHelpers.createSuccess, data: data });
         return dispatch(NavActions.reset('Main'));
       })
       .catch((error) => dispatch({ type: authHelpers.createFailure, error }));
@@ -72,9 +71,18 @@ function destroy() {
  */
 function init() {
   return function (dispatch) {
+    let token;
     return AuthenticationLib.getUserTokenAsync()
-      .then((token) => {
-        dispatch({ type: authHelpers.initSuccess, data: { token } });
+      .then((tokenFetched) => {
+        token = tokenFetched;
+        return AuthenticationLib.getUserIdAsync()
+      })
+      .then((userIdFetched) => {
+        const data = {
+          token: token,
+          userId: userIdFetched
+        }
+        dispatch({ type: authHelpers.initSuccess, data: data });
         return dispatch(NavActions.reset("Main"));
       })
       .catch((error) => {

@@ -12,6 +12,7 @@ import SigninScreen from '../ui/pages/signin/signin_screen';
 import HomeScreen from '../ui/pages/home/home_screen';
 import MapScreen from '../ui/pages/map/map_screen';
 import EventListScreen from '../ui/pages/event_list/event_list_screen';
+import EventShowScreen from '../ui/pages/event_show/event_show_screen';
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -27,6 +28,12 @@ let Root = {
     screen: EventListScreen,
     navigationOptions: {
       title: "EventListScreen"
+    }
+  },
+  EventShowScreen: {
+    screen: EventShowScreen,
+    navigationOptions: {
+      title: "EventShowScreen"
     }
   },
   MapScreen: {

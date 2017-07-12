@@ -15,6 +15,8 @@ import { AppNavigationState } from './app_navigation_state';
 
 const store = configureStore();
 
+global.isWaiter = 0;
+
 export default function native (platform) {
   class Waiter extends Component {
     render () {

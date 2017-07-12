@@ -15,7 +15,6 @@ import mapStyle from './map_style';
 
 const { width, height } = Dimensions.get('window');
 
-console.log(width, height)
 
 const ASPECT_RATIO = width / height;
 const LATITUDE = 37.78825;

@@ -6,6 +6,7 @@ import {
 import { connect } from 'react-redux';
 import { EventsActions } from '../../../actions';
 import EventMiniatureComponent from './event_miniature';
+import ContainerComponent from '../../../container_component';
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -17,7 +18,7 @@ import eventListStyle from './event_list_style';
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-class EventListScreen extends Component {
+class EventListScreen extends ContainerComponent {
 
   constructor(props) {
     super(props);
@@ -49,6 +50,7 @@ class EventListScreen extends Component {
       <EventMiniatureComponent
         key={`miniature_${event._id}`}
         event={event}
+        navigation={this.props.navigation}
       />
     ))
   }

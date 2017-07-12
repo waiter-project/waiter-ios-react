@@ -10,19 +10,33 @@ import StorageLib from './storage_lib';
  * @param {object} params
  * @returns {Promise}
  */
-function authenticateUserAsync (params) {
+function authenticateUserAsync(params) {
   let token;
+  let userId;
   return ApiCallLib.post('/user/login', params)
-    .then((data) => token = data.data.token)
+    .then((data) => {
+      userId = data.data.user._id
+      token = data.data.token
+      return token
+    })
     .then(storeUserTokenAsync)
-    .then(() => token);
+    .then(() => {
+      return storeUserIdAsync(userId)
+    })
+    .then(() => {
+  return {
+    token: token,
+    userId: userId
+  }
+});
 }
 
 /**
  * Destroy user token
  */
 function destroyTokenAsync() {
-  return StorageLib.removeItemAsync("token");
+  return StorageLib.removeItemAsync("token")
+    .then(StorageLib.removeItemAsync("userId"));
 }
 
 /**
@@ -37,6 +51,17 @@ function getUserTokenAsync() {
 }
 
 /**
+ * Get user id
+ */
+function getUserIdAsync() {
+  return StorageLib.getItemAsync("userId")
+    .then((userId) => userId
+      ? Promise.resolve(userId)
+      : Promise.reject(new Error("User userId not found"))
+    );
+}
+
+/**
  * Store user token
  * @param {string} value
  */
@@ -45,6 +70,17 @@ function storeUserTokenAsync(value) {
     return Promise.reject(new Error("token can not be null"));
   }
   return StorageLib.setItemAsync("token", value);
+}
+
+/**
+ * Store user id
+ * @param {string} value
+ */
+function storeUserIdAsync(value) {
+  if (!value) {
+    return Promise.reject(new Error("userId can not be null"));
+  }
+  return StorageLib.setItemAsync("userId", value);
 }
 
 /**
@@ -62,4 +98,6 @@ export default {
   destroyTokenAsync,
   getUserTokenAsync,
   storeUserTokenAsync,
+  storeUserIdAsync,
+  getUserIdAsync
 };
