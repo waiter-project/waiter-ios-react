@@ -51,6 +51,7 @@ function _getHeaders(data, multipart) {
 
   //headers['Content-Type'] = 'application/x-www-form-urlencoded';  // à faire gaff pour plus tard Pahl
   headers['Content-Type'] = 'application/json';
+  headers['x-user-type'] = global.isWater ? 'waiter' : 'client';
 
   return headers;
 }
@@ -86,7 +87,6 @@ function _request(path, method, data) {
     options.body = JSON.stringify(data);
   }
 
-  console.log(options)
 
   return new Promise((resolve, reject) => {
     _getToken((err, token) => {

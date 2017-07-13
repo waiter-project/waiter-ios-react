@@ -6,14 +6,15 @@ import { ScrollView, View, Dimensions, RefreshControl } from 'react-native';
 import ContainerComponent from '../../../container_component';
 import MapView, { MAP_TYPES, PROVIDER_DEFAULT } from 'react-native-maps';
 
-import { EventsActions } from '../../../actions';
+import { EventsActions, WaitActions } from '../../../actions';
 
 import {
   Text,
   Tile,
   Card,
   Slider,
-  Button
+  Button,
+  FormInput
 } from 'react-native-elements';
 
 const EventShowStyle = require('./event_show_style')
@@ -25,18 +26,7 @@ class EventShowScreen extends ContainerComponent {
     this.state = {
       event: {},
       refreshing: false,
-      wait: {
-        _id: "594dc5af1c11408a4d1b0930",
-        state: "queue-done",
-        clientId: "594dbe9b21f0b57d7bdb9803",
-        eventId: "594dc37e21f0b57d7bdb9805",
-        eventName: "Lombard Street",
-        createdAt: "2017-06-24T01:51:43.248Z",
-        nresponses: [],
-        waitersIds: [
-          "594dbeba21f0b57d7bdb9804"
-        ]
-      },
+      wait: {},
       numberToBook: 1
     }
   }
@@ -45,29 +35,99 @@ class EventShowScreen extends ContainerComponent {
     const { dispatch } = this.props.navigation;
     const { params } = this.props.navigation.state;
     this.eventId = _(params).get('id');
-    dispatch(EventsActions.getOneEvent(this.eventId));
+    this.dispatchWithLoader([
+      EventsActions.getOneEvent(this.eventId),
+      WaitActions.getCurrentWait(this.props.auth.userId)
+    ]);
   }
 
   _onRefresh() {
     this.setState({ refreshing: true });
-    this.dispatch(EventsActions.getOneEvent(this.eventId))
+    this.dispatchWithLoader([
+      EventsActions.getOneEvent(this.eventId),
+      WaitActions.getCurrentWait(this.props.auth.userId)
+    ])
       .then(() => {
         this.setState({ refreshing: false });
-      });
+      })
+      .catch(() => {
+        this.setState({ refreshing: false });
+      })
   }
 
   componentWillReceiveProps(nextProps) {
     this.state.event = nextProps.event.toJS().current;
+    this.state.wait = nextProps.wait.toJS().wait;
+
+    console.log(nextProps.wait.toJS())
   }
 
-  _renderWaiter(event) {
-    return (
-      <Text>Waiter</Text>
-    )
+  _renderWaiter(event, userId) {
+    if (!event.listOfWaiters.length && _.isEmpty(wait)) {
+      return (
+        <Text>Waiter can register</Text>
+      )
+    } else if (_.isEmpty(wait)) {
+      return (
+        <Card
+          title="You are now subscribed to this event"
+        >
+          <Text>You'll soon be requested for waiting :)</Text>
+          <Button
+            title="Unsubscribe"
+            backgroundColor='blue'
+          />
+        </Card>)
+    }
+    switch (wait.state) {
+      case 'created':
+        return (
+          <Card
+            title="You have been requested !"
+          >
+            <Text>Press this button to let your client know that you begun waiting :)</Text>
+            <Button
+              title="Start Waiting"
+              backgroundColor='blue'
+            />
+          </Card>)
+      case 'queue-start':
+        return (
+          <Card
+            title="Wait in line !"
+          >
+            <Text>When you're done with you're wait, press this button to let your client know you've done your job</Text>
+            <Button
+              title="My wait is over"
+              backgroundColor='blue'
+            />
+          </Card>)
+      case 'queue-done':
+        return (
+          <Card
+            title="Wait finished !"
+          >
+            <Text>Alright, great job, now don't forget to enter the code your client gave you in order to get paid \o/</Text>
+
+          </Card>)
+      default:
+        return (
+          <Text>Waiter</Text>
+        )
+    }
   }
 
-  _renderNotWaiter(event, wait) {
-    if (!event.listOfWaiters.length) {
+  _requestWait(event) {
+    this.dispatchWithLoader(WaitActions.requestWait(
+      this.props.auth.userId,
+      event._id,
+      this.state.numberToBook
+    ))
+      .then(() => this._onRefresh);
+  }
+
+  _renderNotWaiter(event, wait, userId) {
+    if (!event.listOfWaiters.length && _.isEmpty(wait)) {
       return (
         <Card
           title="No Waiter found"
@@ -80,7 +140,7 @@ class EventShowScreen extends ContainerComponent {
           </Text>
         </Card>
       )
-    } else if (!wait) {
+    } else if (_.isEmpty(wait)) {
       return (
         <Card
           title="Request a Wait"
@@ -96,6 +156,7 @@ class EventShowScreen extends ContainerComponent {
           <Button
             title="Request Wait"
             backgroundColor='blue'
+            onPress={this._requestWait.bind(this, event)}
           />
         </Card>)
     }
@@ -123,13 +184,25 @@ class EventShowScreen extends ContainerComponent {
             />
           </Card>)
       case 'queue-done':
-        return (
-          <Card
-            title="The Wait is over !"
-          >
-            <Text>Congratulation, be sure to give your waiter this code to finalise the transaction :</Text>
-            <Text h4>ADG456H</Text>
-          </Card>)
+        if (wait.confirmationCode && wait.confirmationCode !== "") {
+          return (
+            <Card
+              title="The Wait is over !"
+            >
+              <Text>Congratulation, be sure to give your waiter this code to finalise the transaction :</Text>
+              <Text h4>{wait.confirmationCode}</Text>
+            </Card>
+          )
+        } else {
+          this.dispatch(WaitActions.generateCode(wait._id, userId));
+          return (
+            <Card
+              title="The Wait is over !"
+            >
+              <Text>Your code is generating and will be displayed in a bit :</Text>
+            </Card>
+          )
+        }
       default:
         return (
           <Text>Not Waiter</Text>
@@ -142,6 +215,7 @@ class EventShowScreen extends ContainerComponent {
     let event = this.state.event;
     let wait = this.state.wait;
 
+    console.log(wait);
     if (event.location) {
       return (
 
@@ -166,7 +240,7 @@ class EventShowScreen extends ContainerComponent {
             {event.address}
           </Text>
           {
-            global.isWaiter ? this._renderWaiter(event, wait) : this._renderNotWaiter(event, wait)
+            global.isWaiter ? this._renderWaiter(event, wait, this.props.auth.userId) : this._renderNotWaiter(event, wait, this.props.auth.userId)
           }
           {/*<MapView
             style={EventShowStyle.map}
@@ -187,6 +261,8 @@ class EventShowScreen extends ContainerComponent {
 
 export default connect((state) => {
   return {
-    event: state.event
+    event: state.event,
+    wait: state.wait,
+    auth: state.authentication.toJS()
   };
 })(EventShowScreen);
