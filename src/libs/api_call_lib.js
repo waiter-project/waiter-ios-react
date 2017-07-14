@@ -49,10 +49,11 @@ function _getHeaders(data, multipart) {
 
   let headers = {};
 
-  //headers['Content-Type'] = 'application/x-www-form-urlencoded';  // à faire gaff pour plus tard Pahl
-  headers['Content-Type'] = 'application/json';
-  headers['x-user-type'] = global.isWater ? 'waiter' : 'client';
+  headers['Content-Type'] = 'application/x-www-form-urlencoded';  // à faire gaff pour plus tard Pahl
+  //headers['Content-Type'] = 'application/json';
+  headers['x-user-type'] = global.isWaiter ? 'waiter' : 'client';
 
+console.log(headers)
   return headers;
 }
 
@@ -84,7 +85,7 @@ function _request(path, method, data) {
   };
 
   if (data) {
-    options.body = JSON.stringify(data);
+    options.body = querystring.stringify(data);
   }
 
 

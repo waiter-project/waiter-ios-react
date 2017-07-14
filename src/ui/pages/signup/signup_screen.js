@@ -4,6 +4,7 @@ import { ScrollView, View, Image } from 'react-native';
 import {
   Button,
   FormInput,
+  Text
 } from 'react-native-elements';
 
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
@@ -14,7 +15,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 
 import { AuthenticationActions, LoaderActions } from '../../../actions';
 import { alert } from '../../../helpers';
-import signinStyle from './signin_style';
+import signinStyle from './signup_style';
 import ContainerComponent from '../../../container_component';
 import Loading from '../loader';
 
@@ -26,14 +27,16 @@ const logo = require('../../assets/images/LogoAchanger.png');
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-class SigninScreen extends ContainerComponent {
+class SignupScreen extends ContainerComponent {
 
   constructor(props) {
     super(props);
     this.formData = {};
     this.state = {
       emailFocus: false,
-      passFocus: false
+      passFocus: false,
+      firstNameFocus: false,
+      lastNameFocus: false
     };
   }
 
@@ -45,11 +48,6 @@ class SigninScreen extends ContainerComponent {
     this.identifyUser(this.formData);
   }
 
-  handleSignupPress() {
-    const { navigate } = this.props.navigation;
-    navigate('SignupScreen', {});
-  }
-
   /**
    * Authentify user on remote server and provide access token.
    * @param {object} params
@@ -58,7 +56,7 @@ class SigninScreen extends ContainerComponent {
     this.dispatch([
       LoaderActions.loader(true),
       AuthenticationActions.reset(),
-      AuthenticationActions.create(params),
+      AuthenticationActions.signup(params),
     ]);
   }
 
@@ -80,6 +78,33 @@ class SigninScreen extends ContainerComponent {
           <KeyboardAwareScrollView behavior="position" >
             <View style={signinStyle.hero}>
               <Image source={logo} style={signinStyle.logo} />
+            </View>
+            <View style={signinStyle.containerStyle}>
+              <FormInput
+                ref="firstnameInput"
+                textInputRef="firstName"
+                placeholder={this.state.firstNameFocus ? " " : "First Name"}
+                placeholderTextColor={ColorHelper.textNormal}
+                autoCapitalize="none"
+                autoCorrect={false}
+                onChangeText={this.linkValue("formData.credentials.firstName")}
+                onFocus={() => { this.setState({ firstNameFocus: true }); }}
+                onEndEditing={() => { this.setState({ firstNameFocus: false }); }}
+                inputStyle={signinStyle.inputStyle}
+                containerStyle={signinStyle.containerStyler}
+              />
+            </View>
+            <View style={signinStyle.containerStyle}>
+              <FormInput
+                ref="lastNameInput"
+                placeholder={this.state.lastNameFocus ? " " : "Last Name"}
+                onFocus={() => { this.setState({ lastNameFocus: true }); }}
+                onEndEditing={() => { this.setState({ lastNameFocus: false }); }}
+                placeholderTextColor={ColorHelper.textNormal}
+                onChangeText={this.linkValue("formData.credentials.lastName")}
+                inputStyle={signinStyle.inputStyle}
+                containerStyle={signinStyle.containerStyler}
+              />
             </View>
             <View style={signinStyle.containerStyle}>
               <FormInput
@@ -117,15 +142,7 @@ class SigninScreen extends ContainerComponent {
                 buttonStyle={signinStyle.connectButton}
                 raised={true}
                 color={ColorHelper.textNormal}
-                title={"Sign In"} />
-            </View>
-            <View style={signinStyle.connectContainer}>
-              <Button
-                onPress={this.handleSignupPress.bind(this)}
-                buttonStyle={signinStyle.connectButton}
-                raised={true}
-                color={ColorHelper.textNormal}
-                title={"Sign up"} />
+                title={"Sign Up"} />
             </View>
           </KeyboardAwareScrollView>
         </ScrollView>
@@ -149,4 +166,4 @@ function mapStateToProps(state) {
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
-export default connect(mapStateToProps)(SigninScreen);
+export default connect(mapStateToProps)(SignupScreen);

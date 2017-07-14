@@ -35,12 +35,10 @@ class MapScreen extends Component {
     super(props);
     this.state = {
       events: [],
-      region: {
-        latitude: LATITUDE,
-        longitude: LONGITUDE,
-        latitudeDelta: LATITUDE_DELTA,
-        longitudeDelta: LONGITUDE_DELTA,
-      }
+      latitude: null,
+      longitude: null,
+      error: null,
+      positionLoaded: false
     };
   }
 
@@ -58,6 +56,23 @@ class MapScreen extends Component {
   }
 
   componentDidMount() {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        this.setState({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+          error: null,
+          positionLoaded: true
+        });
+      },
+      (error) => this.setState({ error: error.message }),
+      { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 },
+    );
+  }
+
+  _handleEventPress(event) {
+    const { navigate } = this.props.navigation;
+    navigate('EventShowScreen', { id: event._id });
   }
 
   _generateMarker(events) {
@@ -71,6 +86,7 @@ class MapScreen extends Component {
         pinColor={randomColor()}
         title={marker.name}
         description={marker.description}
+        onCalloutPress={this._handleEventPress.bind(this, marker)}
       />
     ))
   }
@@ -80,16 +96,16 @@ class MapScreen extends Component {
 
 
   render() {
-    const { region } = this.state.region;
     const events = this.state.events;
+    console.log(this.state);
     return (
       <View style={mapStyle.container}>
-        <MapView
+        {this.state.positionLoaded ? <MapView
           style={mapStyle.map}
           mapType={MAP_TYPES.STANDARD}
           initialRegion={{
-            latitude: 37.78825,
-            longitude: -122.4324,
+            latitude: this.state.latitude,
+            longitude: this.state.longitude,
             latitudeDelta: 0.0922,
             longitudeDelta: 0.0421,
           }}
@@ -97,7 +113,7 @@ class MapScreen extends Component {
           {
             this._generateMarker(events)
           }
-        </MapView>
+        </MapView> : null}
       </View>
     );
   } // <= render

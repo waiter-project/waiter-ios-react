@@ -24,11 +24,37 @@ function authenticateUserAsync(params) {
       return storeUserIdAsync(userId)
     })
     .then(() => {
-  return {
-    token: token,
-    userId: userId
-  }
-});
+      return {
+        token: token,
+        userId: userId
+      }
+    });
+}
+
+/**
+ * Authenticate User.
+ * @param {object} params
+ * @returns {Promise}
+ */
+function signupUserAsync(params) {
+  let token;
+  let userId;
+  return ApiCallLib.post('/user/register', params)
+    .then((data) => {
+      userId = data.data.user._id
+      token = data.data.token
+      return token
+    })
+    .then(storeUserTokenAsync)
+    .then(() => {
+      return storeUserIdAsync(userId)
+    })
+    .then(() => {
+      return {
+        token: token,
+        userId: userId
+      }
+    });
 }
 
 /**
@@ -87,9 +113,7 @@ function storeUserIdAsync(value) {
  * Destroy user session.
  */
 function destroySessionAsync() {
-  return ApiCallLib.destroy('/logout')
-    .catch(() => void 0)
-    .then(() => destroyTokenAsync());
+  return destroyTokenAsync();
 }
 
 export default {
@@ -99,5 +123,6 @@ export default {
   getUserTokenAsync,
   storeUserTokenAsync,
   storeUserIdAsync,
-  getUserIdAsync
+  getUserIdAsync,
+  signupUserAsync
 };

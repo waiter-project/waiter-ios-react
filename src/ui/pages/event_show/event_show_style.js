@@ -6,7 +6,12 @@ import { StyleSheet } from 'react-native';
 
 export default StyleSheet.create({
   textHeading: {
-    textAlign: "center"
+    padding: 5,
+    textAlign: 'center',
+  },
+  textContainer: {
+    padding: 5,
+    textAlign: 'center'
   },
   container: {
     position: 'absolute',
@@ -15,8 +20,6 @@ export default StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    justifyContent: 'flex-end',
-    alignItems: 'center'
   },
   map: {
     position: 'absolute',

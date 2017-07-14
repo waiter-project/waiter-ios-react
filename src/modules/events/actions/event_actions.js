@@ -23,13 +23,29 @@ function getOneEvent(eventId) {
   }
 } // <= create
 
+function registerToEvent(eventId, waiterId) {
+
+  return {
+    type: 'EVENT_REGISTER',
+    promise: ApiCallLib.put(`/event/${eventId}/join/${waiterId}`, {})
+  }
+}
+
+function unregisterToEvent(eventId, waiterId) {
+
+  return {
+    type: 'EVENT_REGISTER',
+    promise: ApiCallLib.put(`/event/${eventId}/leave/${waiterId}`, {})
+  }
+}
 
 // --------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------
-
 
 export default {
     getAllEvents,
-    getOneEvent
+    getOneEvent,
+    registerToEvent,
+    unregisterToEvent
 };

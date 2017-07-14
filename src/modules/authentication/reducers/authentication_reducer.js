@@ -51,7 +51,6 @@ function _setAuthSuccess (state, data) {
   if (!data || !data.token) {
     return state;
   }
-  console.log(data)
   return fromJS({ loginFailed: false, isLoggedIn: true, token: data.token, userId: data.userId });
 }
 

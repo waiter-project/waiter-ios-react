@@ -27,8 +27,28 @@ function generateCode(waitId, clientId) {
   }
 }
 
+function changeWaitState(waitId, waiterId, state) {
+  return {
+    type: 'CHANGE_WAIT_STATE',
+    promise: ApiCallLib.put(`/wait/${waitId}/${state}/${waiterId}`, {})
+  }
+}
+
+function validateCode(code, waitId, waiterId) {
+  console.log(code + " " + waiterId + " " + waitId)
+  return {
+    type: 'VALIDATE_CODE',
+    promise: ApiCallLib.put(`/wait/${waitId}/validate`, {
+      waiterId: waiterId,
+      code: code
+    })
+  }
+}
+
 export default {
   getCurrentWait,
   requestWait,
-  generateCode
+  generateCode,
+  changeWaitState,
+  validateCode
 };

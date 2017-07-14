@@ -6,28 +6,29 @@ import { ScrollView, View, Dimensions, RefreshControl } from 'react-native';
 import ContainerComponent from '../../../container_component';
 import MapView, { MAP_TYPES, PROVIDER_DEFAULT } from 'react-native-maps';
 
-import { EventsActions, WaitActions } from '../../../actions';
+import { EventsActions, WaitActions, UserActions } from '../../../actions';
 
 import {
-  Text,
   Tile,
   Card,
   Slider,
   Button,
-  FormInput
+  FormInput,
+  Text
 } from 'react-native-elements';
 
-const EventShowStyle = require('./event_show_style')
+import EventShowStyle from './event_show_style';
 
 class EventShowScreen extends ContainerComponent {
   constructor() {
     super();
-
+    this.code = ""
     this.state = {
       event: {},
       refreshing: false,
       wait: {},
-      numberToBook: 1
+      numberToBook: 1,
+      isBusy: 0,
     }
   }
 
@@ -35,7 +36,7 @@ class EventShowScreen extends ContainerComponent {
     const { dispatch } = this.props.navigation;
     const { params } = this.props.navigation.state;
     this.eventId = _(params).get('id');
-    this.dispatchWithLoader([
+    this.dispatch([
       EventsActions.getOneEvent(this.eventId),
       WaitActions.getCurrentWait(this.props.auth.userId)
     ]);
@@ -43,7 +44,7 @@ class EventShowScreen extends ContainerComponent {
 
   _onRefresh() {
     this.setState({ refreshing: true });
-    this.dispatchWithLoader([
+    this.dispatch([
       EventsActions.getOneEvent(this.eventId),
       WaitActions.getCurrentWait(this.props.auth.userId)
     ])
@@ -58,24 +59,64 @@ class EventShowScreen extends ContainerComponent {
   componentWillReceiveProps(nextProps) {
     this.state.event = nextProps.event.toJS().current;
     this.state.wait = nextProps.wait.toJS().wait;
-
-    console.log(nextProps.wait.toJS())
+    this.state.isBusy = nextProps.user.toJS().user.waiterCurrentEvent ? 1 : 0;
   }
 
-  _renderWaiter(event, userId) {
-    if (!event.listOfWaiters.length && _.isEmpty(wait)) {
+  _register(event, userId) {
+    this.dispatch(EventsActions.registerToEvent(event._id, userId))
+      .then(() => this.dispatch(UserActions.getUser(userId)));
+  }
+
+  _unregister(event, userId) {
+    this.dispatch(EventsActions.unregisterToEvent(event._id, userId))
+      .then(() => this.dispatch(UserActions.getUser(userId)));
+    /*      this.dispatch(WaitActions.requestWait(
+          "59511037b3597b3d701587b6",
+          event._id,
+          1
+        ))
+          .then(() => this._onRefresh);*/
+  }
+
+  _queueStart(waitId, waiterId) {
+    this.dispatch(WaitActions.changeWaitState(waitId, waiterId, "queue-start"));
+  }
+
+  _queueDone(waitId, waiterId) {
+    this.dispatch(WaitActions.changeWaitState(waitId, waiterId, "queue-done"));
+  }
+
+  _validateCode(code, waitId, waiterId) {
+    this.dispatch(WaitActions.validateCode(this.code, waitId, waiterId))
+      .then(() => {
+        this.setState({ isBusy: 0 });
+      });
+  }
+
+  _renderWaiter(event, wait, userId) {
+    if (!this.state.isBusy) {
       return (
-        <Text>Waiter can register</Text>
+        <Card
+          title="You can register to this event"
+        >
+          <Text style={EventShowStyle.textContainer}>Press this button to register</Text>
+          <Button
+            title="Register"
+            backgroundColor='blue'
+            onPress={this._register.bind(this, event, userId)}
+          />
+        </Card>
       )
     } else if (_.isEmpty(wait)) {
       return (
         <Card
           title="You are now subscribed to this event"
         >
-          <Text>You'll soon be requested for waiting :)</Text>
+          <Text style={EventShowStyle.textContainer}>You'll soon be requested for waiting :)</Text>
           <Button
             title="Unsubscribe"
             backgroundColor='blue'
+            onPress={this._unregister.bind(this, event, userId)}
           />
         </Card>)
     }
@@ -85,10 +126,11 @@ class EventShowScreen extends ContainerComponent {
           <Card
             title="You have been requested !"
           >
-            <Text>Press this button to let your client know that you begun waiting :)</Text>
+            <Text style={EventShowStyle.textContainer}>Press this button to let your client know that you begun waiting :)</Text>
             <Button
               title="Start Waiting"
               backgroundColor='blue'
+              onPress={this._queueStart.bind(this, wait._id, userId)}
             />
           </Card>)
       case 'queue-start':
@@ -96,10 +138,11 @@ class EventShowScreen extends ContainerComponent {
           <Card
             title="Wait in line !"
           >
-            <Text>When you're done with you're wait, press this button to let your client know you've done your job</Text>
+            <Text style={EventShowStyle.textContainer}>When you're done with you're wait, press this button to let your client know you've done your job</Text>
             <Button
               title="My wait is over"
               backgroundColor='blue'
+              onPress={this._queueDone.bind(this, wait._id, userId)}
             />
           </Card>)
       case 'queue-done':
@@ -107,8 +150,18 @@ class EventShowScreen extends ContainerComponent {
           <Card
             title="Wait finished !"
           >
-            <Text>Alright, great job, now don't forget to enter the code your client gave you in order to get paid \o/</Text>
-
+            <Text style={EventShowStyle.textContainer}>Alright, great job, now don't forget to enter the code your client gave you in order to get paid \o/</Text>
+            <FormInput
+              onChangeText={(value) => { this.code = value }}
+              placeholder="Enter code here"
+              autoCapitalize="characters"
+              autoCorrect={false}
+            />
+            <Button
+              title="Confirm"
+              backgroundColor='blue'
+              onPress={this._validateCode.bind(this, this.code, wait._id, userId)}
+            />
           </Card>)
       default:
         return (
@@ -118,7 +171,7 @@ class EventShowScreen extends ContainerComponent {
   }
 
   _requestWait(event) {
-    this.dispatchWithLoader(WaitActions.requestWait(
+    this.dispatch(WaitActions.requestWait(
       this.props.auth.userId,
       event._id,
       this.state.numberToBook
@@ -127,15 +180,27 @@ class EventShowScreen extends ContainerComponent {
   }
 
   _renderNotWaiter(event, wait, userId) {
+
+    if (wait._id && wait.eventId !== event._id) {
+      return (
+        <Card
+          title="You can't request more than one wait"
+        >
+          <Text style={EventShowStyle.textContainer}>
+            Sadly, you can't request more that on wait at a time, at least fort now, come back later once your other wait is finished!
+          </Text>
+        </Card>
+      )
+    }
     if (!event.listOfWaiters.length && _.isEmpty(wait)) {
       return (
         <Card
           title="No Waiter found"
         >
-          <Text>
+          <Text style={EventShowStyle.textContainer}>
             Sadly, no waiter was found for this event :/
           </Text>
-          <Text>
+          <Text style={EventShowStyle.textContainer}>
             Swipe down no reload or come back later !
           </Text>
         </Card>
@@ -145,7 +210,7 @@ class EventShowScreen extends ContainerComponent {
         <Card
           title="Request a Wait"
         >
-          <Text>Waiter to Request : {this.state.numberToBook}</Text>
+          <Text style={EventShowStyle.textContainer}>Waiter to Request : {this.state.numberToBook}</Text>
           <Slider
             minimumValue={1}
             maximumValue={event.listOfWaiters.length}
@@ -184,13 +249,14 @@ class EventShowScreen extends ContainerComponent {
             />
           </Card>)
       case 'queue-done':
+        console.log(wait)
         if (wait.confirmationCode && wait.confirmationCode !== "") {
           return (
             <Card
               title="The Wait is over !"
             >
-              <Text>Congratulation, be sure to give your waiter this code to finalise the transaction :</Text>
-              <Text h4>{wait.confirmationCode}</Text>
+              <Text style={EventShowStyle.textContainer}>Congratulation, be sure to give your waiter this code to finalise the transaction :</Text>
+              <Text h4 style={EventShowStyle.textContainer}>{wait.confirmationCode}</Text>
             </Card>
           )
         } else {
@@ -199,7 +265,7 @@ class EventShowScreen extends ContainerComponent {
             <Card
               title="The Wait is over !"
             >
-              <Text>Your code is generating and will be displayed in a bit :</Text>
+              <Text style={EventShowStyle.textContainer}>Your code is generating and will be displayed in a bit :</Text>
             </Card>
           )
         }
@@ -208,7 +274,6 @@ class EventShowScreen extends ContainerComponent {
           <Text>Not Waiter</Text>
         )
     }
-
   }
 
   render() {
@@ -232,11 +297,12 @@ class EventShowScreen extends ContainerComponent {
           >
           </Tile>
           <Text
-            style={EventShowStyle.textHeanding}
-            h4>
+            style={EventShowStyle.textHeading}
+            h6
+          >
             {event.description}
           </Text>
-          <Text>
+          <Text style={EventShowStyle.textContainer}>
             {event.address}
           </Text>
           {
@@ -263,6 +329,7 @@ export default connect((state) => {
   return {
     event: state.event,
     wait: state.wait,
-    auth: state.authentication.toJS()
+    auth: state.authentication.toJS(),
+    user: state.user
   };
 })(EventShowScreen);

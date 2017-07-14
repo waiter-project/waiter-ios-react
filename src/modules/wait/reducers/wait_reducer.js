@@ -18,6 +18,7 @@ function wait_reducer (state = defaultState, action) {
     case 'GENERATE_CODE_SUCCESS':
       let newWait = state.toJS().wait;
       newWait.confirmationCode = action.data.data.code;
+      console.log(action.data.data.code);
       return state.set("wait.confirmationCode", newWait);
 
     case 'GENERATE_CODE_SUCCESS':

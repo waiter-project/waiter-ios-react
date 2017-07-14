@@ -7,6 +7,7 @@ import authHelpers from '../authentication_helpers';
 
 
 import NavActions from '../../../actions/navigation_actions';
+import { UserActions } from '../../../actions/index';
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -33,6 +34,7 @@ function initializeWithToken(token) {
  * @returns {function}
  */
 function create(params) {
+  let data;
   return function (dispatch) {
     return AuthenticationLib.authenticateUserAsync({
       email: params.credentials.username,
@@ -40,7 +42,41 @@ function create(params) {
       deviceId: "device_id_here"
     }
     )
-      .then((data) => {
+      .then((dataFetched) => {
+        data = dataFetched;
+        return dispatch(UserActions.getUser(data.userId))
+      })
+      .then(() => {
+        dispatch({ type: authHelpers.createSuccess, data: data });
+        return dispatch(NavActions.reset('Main'));
+      })
+      .catch((error) => dispatch({ type: authHelpers.createFailure, error }));
+  };
+}
+
+/**
+ *
+ * Create authentication token
+ * @param {Object} params
+ * @returns {function}
+ */
+function signup(params) {
+  let data;
+  return function (dispatch) {
+    return AuthenticationLib.signupUserAsync({
+      email: params.credentials.username,
+      password: params.credentials.password,
+      deviceId: "device_id_here",
+      firstName: params.credentials.firstName,
+      lastName: params.credentials.lastName,
+      type: 0
+    }
+    )
+      .then((dataFetched) => {
+        data = dataFetched;
+        return dispatch(UserActions.getUser(data.userId))
+      })
+      .then(() => {
         dispatch({ type: authHelpers.createSuccess, data: data });
         return dispatch(NavActions.reset('Main'));
       })
@@ -56,7 +92,7 @@ function create(params) {
 function destroy() {
   return function (dispatch) {
     return AuthenticationLib.destroySessionAsync()
-      .catch(() => void 0)
+      .catch(() => console.log("error while logging out"))
       .then(() => {
         dispatch({ type: authHelpers.destroySuccess });
         return dispatch(NavActions.reset('Home'));
@@ -72,15 +108,20 @@ function destroy() {
 function init() {
   return function (dispatch) {
     let token;
+    let userId;
     return AuthenticationLib.getUserTokenAsync()
       .then((tokenFetched) => {
         token = tokenFetched;
         return AuthenticationLib.getUserIdAsync()
       })
       .then((userIdFetched) => {
+        userId = userIdFetched;
+        return dispatch(UserActions.getUser(userIdFetched))
+      })
+      .then((userIdFetched) => {
         const data = {
           token: token,
-          userId: userIdFetched
+          userId: userId
         }
         dispatch({ type: authHelpers.initSuccess, data: data });
         return dispatch(NavActions.reset("Main"));
@@ -124,5 +165,6 @@ export default {
   destroy,
   init,
   reset,
-  initializeWithToken
+  initializeWithToken,
+  signup
 };

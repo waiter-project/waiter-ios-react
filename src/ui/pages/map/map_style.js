@@ -15,8 +15,7 @@ export default StyleSheet.create({
     right: 0,
     bottom: 0,
     justifyContent: 'flex-end',
-    alignItems: 'center',
-    backgroundColor: 'red'
+    alignItems: 'center'
   },
   map: {
     position: 'absolute',
