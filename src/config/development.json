@@ -1,7 +1,7 @@
 {
   "api": {
     "protocol": "http",
-    "host": "localhost",
+    "host": "wait4me.tk",
     "port": 5000
   }
 }

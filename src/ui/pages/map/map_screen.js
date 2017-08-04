@@ -65,7 +65,12 @@ class MapScreen extends Component {
           positionLoaded: true
         });
       },
-      (error) => this.setState({ error: error.message }),
+      (error) => this.setState({
+        error: error.message,
+        latitude: 48.864716,
+        longitude: 2.349014,
+        positionLoaded: true
+      }),
       { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 },
     );
   }
@@ -106,8 +111,8 @@ class MapScreen extends Component {
           initialRegion={{
             latitude: this.state.latitude,
             longitude: this.state.longitude,
-            latitudeDelta: 0.0922,
-            longitudeDelta: 0.0421,
+            latitudeDelta: 0.1844,
+            longitudeDelta: 0.0842,
           }}
         >
           {

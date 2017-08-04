@@ -280,7 +280,6 @@ class EventShowScreen extends ContainerComponent {
     let event = this.state.event;
     let wait = this.state.wait;
 
-    console.log(wait);
     if (event.location) {
       return (
 
