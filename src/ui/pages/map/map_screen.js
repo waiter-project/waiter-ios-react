@@ -56,7 +56,7 @@ class MapScreen extends Component {
   }
 
   componentDidMount() {
-    navigator.geolocation.getCurrentPosition(
+    navigator.geolocation.watchPosition(
       (position) => {
         this.setState({
           latitude: position.coords.latitude,
@@ -106,6 +106,7 @@ class MapScreen extends Component {
     return (
       <View style={mapStyle.container}>
         {this.state.positionLoaded ? <MapView
+          showsUserLocation={true}
           style={mapStyle.map}
           mapType={MAP_TYPES.STANDARD}
           initialRegion={{

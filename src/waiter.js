@@ -17,6 +17,8 @@ const store = configureStore();
 
 global.isWaiter = 1;
 
+//navigator.geolocation.requestAuthorization();
+
 export default function native (platform) {
   class Waiter extends Component {
     render () {

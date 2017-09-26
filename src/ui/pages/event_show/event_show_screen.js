@@ -17,6 +17,9 @@ import {
   Text
 } from 'react-native-elements';
 
+import StarRating from 'react-native-star-rating';
+
+
 import EventShowStyle from './event_show_style';
 
 class EventShowScreen extends ContainerComponent {
@@ -29,6 +32,8 @@ class EventShowScreen extends ContainerComponent {
       wait: {},
       numberToBook: 1,
       isBusy: 0,
+      rated: false,
+      starCount: 3
     }
   }
 
@@ -70,12 +75,6 @@ class EventShowScreen extends ContainerComponent {
   _unregister(event, userId) {
     this.dispatch(EventsActions.unregisterToEvent(event._id, userId))
       .then(() => this.dispatch(UserActions.getUser(userId)));
-    /*      this.dispatch(WaitActions.requestWait(
-          "59511037b3597b3d701587b6",
-          event._id,
-          1
-        ))
-          .then(() => this._onRefresh);*/
   }
 
   _queueStart(waitId, waiterId) {
@@ -179,6 +178,18 @@ class EventShowScreen extends ContainerComponent {
       .then(() => this._onRefresh);
   }
 
+  _onStarRatingPress(rating) {
+    this.setState({
+      starCount: rating
+    });
+  }
+
+  _onSubmitRating() {
+    this.setState({
+      rated: true
+    })
+  }
+
   _renderNotWaiter(event, wait, userId) {
 
     if (wait._id && wait.eventId !== event._id) {
@@ -250,7 +261,7 @@ class EventShowScreen extends ContainerComponent {
           </Card>)
       case 'queue-done':
         console.log(wait)
-        if (wait.confirmationCode && wait.confirmationCode !== "") {
+        if (wait.confirmationCode && wait.confirmationCode !== "" && this.state.rated !== false) {
           return (
             <Card
               title="The Wait is over !"
@@ -265,7 +276,19 @@ class EventShowScreen extends ContainerComponent {
             <Card
               title="The Wait is over !"
             >
-              <Text style={EventShowStyle.textContainer}>Your code is generating and will be displayed in a bit :</Text>
+              <Text style={EventShowStyle.textContainer}>Rate your waiter to see your code :</Text>
+              <StarRating
+                disabled={false}
+                maxStars={5}
+                rating={this.state.starCount}
+                selectedStar={(rating) => this._onStarRatingPress(rating)}
+                style={{ paddingVertical: 10 }}
+              />
+              <Button
+                title="Submit"
+                backgroundColor='blue'
+                onPress={this._onSubmitRating.bind(this)}
+              />
             </Card>
           )
         }
