@@ -55,6 +55,11 @@ class SettingScreen extends ContainerComponent {
     navigate('InfoScreen', {});
   }
 
+  _pastWaitsPressed() {
+    const { navigate } = this.props.navigation;
+    navigate('PastWaitsScreen', {});
+  }
+
   _onSwitch() {
     global.isWaiter = !global.isWaiter;
     this.setState({isWaiter: global.isWaiter});
@@ -72,6 +77,11 @@ class SettingScreen extends ContainerComponent {
           title="Info"
           leftIcon={{ name: "accessibility" }}
           onPress={this._infoPressed.bind(this)}
+        />
+        <ListItem
+          title="Past waits"
+          leftIcon={{ name: "av-timer" }}
+          onPress={this._pastWaitsPressed.bind(this)}
         />
         <ListItem
           title={`Switch to ${global.isWaiter ? "client" : "waiter"}`}

@@ -1,7 +1,9 @@
 import Immutable from 'immutable';
 
 const defaultState = new Immutable.fromJS({
-    user: {}
+    user: {},
+    pastWaits: [],
+    passwordChangeStatus: 0
 });
 
 function user_reducer (state = defaultState, action) {
@@ -9,10 +11,12 @@ function user_reducer (state = defaultState, action) {
   switch (action.type) {
 
     case 'PASSWORD_UPDATE_SUCCESS':
-        return state;
+        nextState = state.set("passwordChangeStatus", 1);
+        return nextState;
 
     case 'PASSWORD_UPDATE_FAILURE':
-        return state;
+        nextState = state.set("passwordChangeStatus", 2);
+        return nextState;
 
     case 'PROFILE_UPDATE_SUCCESS':
         let oldUser = state.get('user');
@@ -31,6 +35,13 @@ function user_reducer (state = defaultState, action) {
 
     case 'GET_USER_FAILURE':
         return state;
+
+    case 'GET_PAST_WAITS_SUCCESS':
+        nextState = state.set('pastWaits', action.data.data.wait)
+        return nextState;
+
+    case 'GET_PAST_WAITS_FAILURE':
+      return state;
 
     default:
         return state;

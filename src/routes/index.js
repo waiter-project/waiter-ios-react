@@ -17,6 +17,8 @@ import SettingScreen from '../ui/pages/setting/settings_screen';
 import SecurityScreen from '../ui/pages/security/security_screen';
 import InfoScreen from '../ui/pages/info/info_screen';
 import SignupScreen from '../ui/pages/signup/signup_screen';
+import PastWaitsScreen from '../ui/pages/past_wait/past_wait_screen';
+
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -50,6 +52,12 @@ let Root = {
     screen: SecurityScreen,
     navigationOptions: {
       title: "Password Change"
+    }
+  },
+  PastWaitsScreen: {
+    screen: PastWaitsScreen,
+    navigationOptions: {
+      title: "My Past Waits"
     }
   },
   InfoScreen: {

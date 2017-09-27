@@ -7,9 +7,6 @@ import ApiCallLib from '../../../libs/api_call_lib';
 // --------------------------------------------------------------------------------
 
 function updatePassword(updatedPassword) {
-
-  console.log(updatedPassword)
-
   return {
     type: 'PASSWORD_UPDATE',
     promise: ApiCallLib.put(`/user/${updatedPassword.userId}/password`, {
@@ -43,6 +40,13 @@ function getUser(userId) {
     }
 }
 
+function getPastWaits(userId) {
+    return {
+        type: "GET_PAST_WAITS",
+        promise: ApiCallLib.get(`/wait/user/${userId}/history`, {})
+    }
+}
+
 // --------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------
@@ -51,5 +55,6 @@ function getUser(userId) {
 export default {
   updatePassword,
   getUser,
-  updateUser
+  updateUser,
+  getPastWaits
 };

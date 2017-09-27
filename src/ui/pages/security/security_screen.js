@@ -17,6 +17,8 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 
 import { ColorHelper } from '../../../helpers';
 
+import { alert } from '../../../helpers';
+
 class SecurityScreen extends ContainerComponent {
   constructor() {
     super();
@@ -27,6 +29,21 @@ class SecurityScreen extends ContainerComponent {
       passFocus: false,
       newPassFocus: false
     };
+  }
+
+  componentWillReceiveProps(nextProps) {
+    console.log(nextProps)
+    if (nextProps.passwordState === 1) {
+      alert(
+        "Password changed successfully",
+        "you can start using your new password"
+      );
+    } else if (nextProps.passwordState === 2) {
+      alert(
+        "Error while changing password",
+        "An error occured, check your password"
+      );
+    }
   }
 
   _handleSubmit() {
@@ -81,7 +98,8 @@ class SecurityScreen extends ContainerComponent {
 
 function mapStateToProps(state) {
   return {
-    user: state.user.toJS().user
+    user: state.user.toJS().user,
+    passwordState: state.user.toJS().passwordChangeStatus
   };
 };
 
