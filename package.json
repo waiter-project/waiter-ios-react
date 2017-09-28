@@ -16,7 +16,7 @@
     "moment": "^2.18.1",
     "querystring": "^0.2.0",
     "react": "^16.0.0-alpha.6",
-    "react-native": "^0.44.0",
+    "react-native": "0.43.0",
     "react-native-communications": "^2.2.1",
     "react-native-device-info": "^0.10.1",
     "react-native-elements": "^0.10.2",

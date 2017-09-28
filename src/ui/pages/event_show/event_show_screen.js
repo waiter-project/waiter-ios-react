@@ -260,7 +260,6 @@ class EventShowScreen extends ContainerComponent {
             />
           </Card>)
       case 'queue-done':
-        console.log(wait)
         if (wait.confirmationCode && wait.confirmationCode !== "" && this.state.rated !== false) {
           return (
             <Card
