@@ -55,6 +55,11 @@ class SettingScreen extends ContainerComponent {
     navigate('InfoScreen', {});
   }
 
+  _addCardPressed() {
+    const { navigate } = this.props.navigation;
+    navigate('RNCreditCard', {});
+  }
+
   _pastWaitsPressed() {
     const { navigate } = this.props.navigation;
     navigate('PastWaitsScreen', {});
@@ -63,6 +68,7 @@ class SettingScreen extends ContainerComponent {
   _onSwitch() {
     global.isWaiter = !global.isWaiter;
     this.setState({isWaiter: global.isWaiter});
+    this.props.navigation.setParams({isWaiter: global.isWaiter});
   }
 
   render() {
@@ -77,6 +83,11 @@ class SettingScreen extends ContainerComponent {
           title="Info"
           leftIcon={{ name: "accessibility" }}
           onPress={this._infoPressed.bind(this)}
+        />
+        <ListItem
+          title="AddCard"
+          leftIcon={{ name: "accessibility" }}
+          onPress={this._addCardPressed.bind(this)}
         />
         <ListItem
           title="Past waits"

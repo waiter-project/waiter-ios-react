@@ -14,17 +14,13 @@ import SettingScreen from '../ui/pages/setting/settings_screen';
 const iconSize = 35;
 
 const tabBarOptions = {
-  showIcon: true,
-  style: {
-    backgroundColor: "#FFFFFF"
-  }
+  showIcon: true
 };
 
 const MainStack = TabNavigator({
   Waiter: {
     screen: EventListScreen,
     navigationOptions: {
-      headerTintColor: "#FF0000",
       title: "Waiter",
       tabBarLabel: "Waiter",
       tabBarIcon: ({ tintColor }) => <Icon name="event" size={iconSize} color={tintColor} />,
@@ -33,7 +29,6 @@ const MainStack = TabNavigator({
   MapScreen: {
     screen: MapScreen,
     navigationOptions: {
-      headerTintColor: "#0000FF",
       title: "MapScreen",
       tabBarLabel: "MapScreen",
       tabBarIcon: ({ tintColor }) => <Icon name="map" size={iconSize} color={tintColor} />,
@@ -42,7 +37,6 @@ const MainStack = TabNavigator({
   SettingScreen: {
     screen: SettingScreen,
     navigationOptions: {
-      headerTintColor: "#0000FF",
       title: "Setting",
       tabBarLabel: "Settings",
       tabBarIcon: ({ tintColor }) => <Icon name="build" size={iconSize} color={tintColor} />,

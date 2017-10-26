@@ -18,6 +18,7 @@ import SecurityScreen from '../ui/pages/security/security_screen';
 import InfoScreen from '../ui/pages/info/info_screen';
 import SignupScreen from '../ui/pages/signup/signup_screen';
 import PastWaitsScreen from '../ui/pages/past_wait/past_wait_screen';
+import RNCreditCard from '../ui/pages/add_card/add_card_screen';
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -66,6 +67,12 @@ let Root = {
       title: "Info Change"
     }
   },
+  RNCreditCard: {
+    screen: RNCreditCard,
+    navigationOptions: {
+      title: "Info Change"
+    }
+  },
   MapScreen: {
     screen: MapScreen,
     navigationOptions: {
@@ -74,6 +81,7 @@ let Root = {
   },
   Home: {
     screen: HomeScreen,
+    navigationOptions: ({ navigation }) => { navigation }
   },
   Signin: {
     screen: SigninScreen,
@@ -85,16 +93,32 @@ let Root = {
     screen: SignupScreen,
   },
   Main: {
-    screen: MainStack
+    screen: MainStack,
   },
 };
 
 let RootNavigator = StackNavigator(Root, {
   initialRouteName: "Home",
   headerMode: "screen",
-  navigationOptions: {
-    headerBackTitle: null,
+  navigationOptions: ({ navigation }) => {
+    return ({
+      headerBackTitle: null,
+      headerTintColor: "#FFFFFF",
+      tabBarColor: {
+        backgroundColor: navigation.state.routes ?
+          (navigation.state.routes[2] ?
+            (navigation.state.routes[2].params ?
+              (navigation.state.routes[2].params.isWaiter ? "#1e4561" : "#65a5a7") : "#1e4561") : "#1e4561") : "#1e4561"
+      },
+      headerStyle: {
+        backgroundColor: navigation.state.routes ?
+          (navigation.state.routes[2] ?
+            (navigation.state.routes[2].params ?
+              (navigation.state.routes[2].params.isWaiter ? "#1e4561" : "#65a5a7") : "#1e4561") : "#1e4561") : "#1e4561"
+      },
+    })
   }
+
 });
 
 export default RootNavigator;
