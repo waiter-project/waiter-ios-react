@@ -1,0 +1,10 @@
+# Use iOS 8 and above
+platform :ios, '8.0'
+
+# Specify Workspace
+workspace 'Waiter'
+
+target 'Waiter' do
+  # Stripe
+  pod 'Stripe', '~> 10.1.0'
+end

@@ -47,6 +47,27 @@ function getPastWaits(userId) {
     }
 }
 
+function getCards(userId) {
+  return {
+      type: "GET_CARDS",
+      promise: ApiCallLib.get(`/user/${userId}/get-cards`, {})
+  }
+}
+
+function  saveCard(userId, token) {
+  console.log("xouxou")
+  return {
+      type: "SAVE_CARD",
+      info: {
+        "cardToken": token
+      },
+      promise: ApiCallLib.put(`/user/${userId}/add-new-card/${token}`, {
+        userId: userId,
+        cardToken: token
+      })
+  }
+}
+
 // --------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------
@@ -56,5 +77,7 @@ export default {
   updatePassword,
   getUser,
   updateUser,
-  getPastWaits
+  getPastWaits,
+  getCards,
+  saveCard
 };
