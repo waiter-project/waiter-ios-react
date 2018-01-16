@@ -1,7 +1,6 @@
 {
   "api": {
-    "protocol": "http",
-    "host": "localhost",
-    "port": 5000
+    "protocol": "https",
+    "host": "waiter-api.herokuapp.com"
   }
 }

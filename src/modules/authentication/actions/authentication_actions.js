@@ -1,5 +1,6 @@
 import AuthenticationLib from '../../../libs/auth_lib';
 import authHelpers from '../authentication_helpers';
+import StorageLib from '../../../libs/storage_lib';
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
@@ -36,12 +37,13 @@ function initializeWithToken(token) {
 function create(params) {
   let data;
   return function (dispatch) {
-    return AuthenticationLib.authenticateUserAsync({
+    return StorageLib.getItemAsync("deviceId")
+    .then((deviceId) => AuthenticationLib.authenticateUserAsync({
       email: params.credentials.username,
       password: params.credentials.password,
-      deviceId: "device_id_here"
+      deviceId: deviceId
     }
-    )
+    ))
       .then((dataFetched) => {
         data = dataFetched;
         return dispatch(UserActions.getUser(data.userId))
@@ -63,15 +65,16 @@ function create(params) {
 function signup(params) {
   let data;
   return function (dispatch) {
-    return AuthenticationLib.signupUserAsync({
+    return StorageLib.getItemAsync("deviceId")
+    .then((deviceId) => AuthenticationLib.signupUserAsync({
       email: params.credentials.username,
       password: params.credentials.password,
-      deviceId: "device_id_here",
+      deviceId: deviceId,
       firstName: params.credentials.firstName,
       lastName: params.credentials.lastName,
       type: 0
     }
-    )
+    ))
       .then((dataFetched) => {
         data = dataFetched;
         return dispatch(UserActions.getUser(data.userId))

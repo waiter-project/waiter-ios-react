@@ -13,6 +13,7 @@
 #import <React/RCTRootView.h>
 
 @implementation AppDelegate
+@synthesize oneSignal = _oneSignal;
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
@@ -31,6 +32,10 @@
   rootViewController.view = rootView;
   self.window.rootViewController = rootViewController;
   [self.window makeKeyAndVisible];
+  
+  self.oneSignal = [[RCTOneSignal alloc] initWithLaunchOptions:launchOptions
+                                                         appId:@"7d0bc3b2-2567-4ea0-bfae-ec67478165cd"];
+  
   return YES;
 }
 
