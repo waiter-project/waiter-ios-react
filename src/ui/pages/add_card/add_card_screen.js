@@ -59,7 +59,6 @@ class AddCardScreen extends ContainerComponent {
 
   _addNewInfo() {
     const options = {
-      smsAutofillDisabled: true
     };
     stripe.paymentRequestWithCardForm(options)
       .then(response => {

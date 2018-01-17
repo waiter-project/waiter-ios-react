@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import React from 'react';
+import { connect } from 'react-redux'
 import SplashScreen from 'react-native-splash-screen';
 import OneSignal from 'react-native-onesignal'; // Import package from node modules
 
@@ -8,14 +9,19 @@ import OneSignal from 'react-native-onesignal'; // Import package from node modu
 // -------------------------------------------------------------------------------------------------
 
 const config = require('../../../config');
-import { AuthenticationActions } from '../../../actions';
+import { AuthenticationActions, EventsActions } from '../../../actions';
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
 class HomeScreen extends React.Component {
-
+  constructor() {
+    super();
+    this.state = {
+      event: {}
+    }
+  }
   /**
    * attach event
    */
@@ -36,6 +42,9 @@ class HomeScreen extends React.Component {
     console.log('Data: ', openResult.notification.payload.additionalData);
     console.log('isActive: ', openResult.notification.isAppInFocus);
     console.log('openResult: ', openResult);
+    /* if (this.state.event) {
+        navigate('EventShowScreen', { id: this.state.event._id });
+    } */
   }
 
   onRegistered(notifData) {
@@ -44,6 +53,10 @@ class HomeScreen extends React.Component {
 
   onIds(device) {
     console.log('Device info: ', device);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.state.event = nextProps.event.toJS().current;
   }
 
   /**
@@ -65,4 +78,10 @@ class HomeScreen extends React.Component {
   }
 }
 
-export default HomeScreen;
+export default connect((state) => {
+  return {
+    event: state.event
+  };
+})(HomeScreen);
+
+//export default HomeScreen;
